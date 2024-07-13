@@ -14,7 +14,7 @@ class map_iterator
 public:
     constexpr map_iterator(begin_type iterator, end_type end, transform_type transform) : m_iterator{ iterator }, m_end{ end }, transform{ transform } { }
 
-    constexpr auto operator*() const { return transform(*m_iterator); }
+    constexpr auto operator*() const { return std::invoke(transform, *m_iterator); }
 
     constexpr auto& operator++()
     {

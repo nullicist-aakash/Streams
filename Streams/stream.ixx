@@ -26,17 +26,19 @@ public:
     constexpr auto begin() const { return m_begin; }
     constexpr auto end() const { return m_end; }
 
-    constexpr auto filter(const auto& predicate) const
+    template <typename T> requires std::invocable<T, value_type>
+    constexpr auto filter(const T&& predicate) const
     {
         auto container = filter_container{ m_begin, m_end, predicate };
         return stream<decltype(container)>{ std::move(container) };
     }
 
-    constexpr auto map(const auto& transform) const
-	{
+    template <typename T> requires std::invocable<T, value_type>
+    constexpr auto map(T&& transform) const
+    {
         auto container = map_container{ m_begin, m_end, transform };
         return stream<decltype(container)>{ std::move(container) };
-	}
+    }
 };
 
 export template <std::integral basic_type>

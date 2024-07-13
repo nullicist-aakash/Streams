@@ -3,10 +3,17 @@ import stream;
 
 using namespace std;
 
+struct P
+{
+	int x;
+	bool valid;
+};
+
 int main()
 {
+	vector<P> v{ {1, true}, {2, false} };
 	int sum = 0;
-	for (auto i : int_stream(0, 10).filter([](auto i) { return i % 2 == 0; }).map([](auto i) { return i * 2; }))
+	for (auto i : stream(v).filter(&P::valid).map(&P::x).map([](auto i) { return i + 5; }))
 	{
 		sum += i;
 	}
