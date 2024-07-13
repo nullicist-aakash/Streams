@@ -3,19 +3,30 @@ import stream;
 
 using namespace std;
 
-struct P
+bool isPrime(int i) 
 {
-	int x;
-	bool valid;
-};
+	if (i <= 1)
+		return false;
+
+	if (i == 2)
+		return true;
+
+	if (i % 2 == 0)
+		return false;
+
+	for (int j = 3; j <= std::sqrt(i); j += 2)
+	{
+		if (i % j == 0)
+			return false;
+	}
+
+	return true;
+}
 
 int main()
 {
-	vector<P> v{ {1, true}, {2, false} };
-	int sum = 0;
-	for (auto i : int_stream(1, 15).limit(8))
+	for (auto i : int_stream(1, 1000).filter(&isPrime).limit(5))
 	{
-		sum += i;
+		cout << i << endl;
 	}
-	return sum;
 }

@@ -9,7 +9,7 @@ class filter_iterator
     const end_type m_end;
     const predicate_type predicate;
     static_assert(std::invocable<predicate_type, decltype(*m_iterator)>, "Predicate is not invocable with the value type of the container!");
-    static_assert(std::same_as<std::remove_cvref_t<std::invoke_result_t<predicate_type, begin_type>>, bool>, "Predicate does not return a boolean value!");
+    static_assert(std::same_as<std::remove_cvref_t<decltype(std::invoke(predicate, *m_iterator))>, bool>, "Predicate does not return a boolean value!");
 
 public:
     constexpr filter_iterator(begin_type iterator, end_type end, predicate_type predicate) : m_iterator{ iterator }, m_end{ end }, predicate{ predicate }
@@ -39,7 +39,7 @@ struct filter_container
     const end_type m_end;
     const predicate_type predicate;
     static_assert(std::invocable<predicate_type, decltype(*m_begin)>, "Predicate is not invocable with the value type of the container!");
-    static_assert(std::same_as<std::remove_cvref_t<std::invoke_result_t<predicate_type, begin_type>>, bool>, "Predicate does not return a boolean value!");
+    static_assert(std::same_as<std::remove_cvref_t<decltype(std::invoke(predicate, *m_begin))>, bool>, "Predicate does not return a boolean value!");
 
     constexpr auto begin() const { return filter_iterator(m_begin, m_end, predicate); }
     constexpr auto end() const { return sentinel{}; }
