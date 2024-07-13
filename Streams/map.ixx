@@ -28,7 +28,7 @@ public:
 };
 
 template <typename begin_type, typename end_type, typename transform_type>
-    requires valid_iterator<begin_type, end_type>&& std::invocable<transform_type, decltype(*std::declval<begin_type>())>
+    requires valid_iterator<begin_type, end_type> && std::invocable<transform_type, decltype(*std::declval<begin_type>())>
 struct map_container
 {
     const begin_type m_begin;

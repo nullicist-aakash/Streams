@@ -193,6 +193,7 @@
   <ItemGroup>
     <ClCompile Include="common.ixx" />
     <ClCompile Include="filter.ixx" />
+    <ClCompile Include="limit.ixx" />
     <ClCompile Include="map.ixx" />
     <ClCompile Include="range.ixx" />
     <ClCompile Include="stream.ixx" />

@@ -2,6 +2,7 @@ export module stream;
 import :range;
 import :filter;
 import :map;
+import :limit;
 
 export template <typename Container> requires requires(Container cont) { cont.begin(); cont.end(); }
 class stream
@@ -39,6 +40,12 @@ public:
         auto container = map_container{ m_begin, m_end, transform };
         return stream<decltype(container)>{ std::move(container) };
     }
+
+    constexpr auto limit(int limit) const
+	{
+		auto container = limit_container{ m_begin, m_end, limit };
+		return stream<decltype(container)>{ std::move(container) };
+	}
 };
 
 export template <std::integral basic_type>
