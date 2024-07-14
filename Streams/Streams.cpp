@@ -5,6 +5,6 @@ using namespace std;
 
 int main()
 {
-	string s = "5 apples and 25 oranges";
-	stream(s).distinct().peek([&](auto x) { cout << "Peeked " << x << "\n"; }).for_each([](char c) { cout << c; });
+	vector s{ 1,2,4,4,3,2,6 };
+	stream(s).sorted().for_each([](auto i) { cout << i << " "; });
 }

@@ -9,7 +9,7 @@ import std;
 export template <typename Container> requires requires(Container cont) { cont.begin(); cont.end(); }
 class stream
 {
-    using value_type = decltype(*std::declval<Container>().begin());
+    using value_type = std::remove_cvref_t<decltype(*std::declval<Container>().begin())>;
     using begin_type = decltype(std::declval<Container>().begin());
     using end_type = decltype(std::declval<Container>().end());
 
@@ -76,6 +76,13 @@ public:
         while (that.m_begin != that.m_end && skip-- > 0)
 			++that.m_begin;
         return that;
+    }
+
+    constexpr auto sorted() const
+    {
+        std::vector<value_type> container{ m_begin, m_end };
+        std::sort(container.begin(), container.end());
+        return stream<decltype(container)>{ std::move(container) };
     }
 };
 
