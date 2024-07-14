@@ -2,7 +2,7 @@ export module stream:distinct;
 
 import :common;
 
-template <typename begin_type, typename end_type> requires valid_iterator<begin_type, end_type>
+template <typename begin_type, typename end_type> requires is_valid_iterator<begin_type, end_type>
 class distinct_iterator
 {
     begin_type m_iterator;
@@ -29,7 +29,7 @@ public:
     static friend constexpr auto operator!= (const distinct_iterator& a, const end_type& end) { return a.m_iterator != end; };
 };
 
-template <typename begin_type, typename end_type> requires valid_iterator<begin_type, end_type>
+template <typename begin_type, typename end_type> requires is_valid_iterator<begin_type, end_type>
 struct distinct_container
 {
     const begin_type m_begin;

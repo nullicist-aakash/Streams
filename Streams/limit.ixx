@@ -3,7 +3,7 @@ import :common;
 import std;
 
 template <typename begin_type, typename end_type>
-    requires valid_iterator<begin_type, end_type>
+    requires is_valid_iterator<begin_type, end_type>
 class limit_iterator
 {
     begin_type m_iterator;
@@ -28,7 +28,7 @@ public:
 };
 
 template <typename begin_type, typename end_type>
-    requires valid_iterator<begin_type, end_type>
+    requires is_valid_iterator<begin_type, end_type>
 struct limit_container
 {
     const begin_type m_begin;

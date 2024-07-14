@@ -2,7 +2,7 @@ export module stream:peek;
 import :common;
 
 template <typename begin_type, typename end_type, typename transform_type>
-    requires valid_iterator<begin_type, end_type>&& std::invocable<transform_type, decltype(*std::declval<begin_type>())>
+    requires is_valid_iterator<begin_type, end_type>
 class peek_iterator
 {
     using mapped_type = std::invoke_result_t<transform_type, decltype(*std::declval<begin_type>())>;
@@ -33,7 +33,7 @@ public:
 };
 
 template <typename begin_type, typename end_type, typename transform_type>
-    requires valid_iterator<begin_type, end_type>&& std::invocable<transform_type, decltype(*std::declval<begin_type>())>
+    requires is_valid_iterator<begin_type, end_type>
 struct peek_container
 {
     const begin_type m_begin;

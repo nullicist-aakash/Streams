@@ -2,7 +2,7 @@ export module stream:generate;
 import :common;
 import std;
 
-template <typename op_type> requires std::invocable<op_type>
+template <typename op_type>
 class generate_iterator
 {
     const op_type op;
@@ -27,7 +27,7 @@ public:
     friend constexpr auto operator!= (const generate_iterator& a, sentinel end) { return true; };
 };
 
-template <typename op_type> requires std::invocable<op_type>
+template <typename op_type>
 struct generate_container
 {
     const op_type op;

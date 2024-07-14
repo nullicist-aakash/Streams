@@ -27,7 +27,7 @@ public:
     constexpr auto& end() const { return m_end; }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto all_match(op_type predicate) const
 	{
         for (const auto& entry: *this)
@@ -37,7 +37,7 @@ public:
 	}
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto any_match(op_type predicate) const
     {
         for (const auto& entry: *this)
@@ -53,7 +53,7 @@ public:
 	}
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto filter(op_type predicate) const
     {
         auto container = filter_container{ m_begin, m_end, predicate };
@@ -69,7 +69,7 @@ public:
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto find_first(op_type predicate) const
     {
         std::optional<std::remove_cvref_t<decltype(*this->begin())>> op{ std::nullopt };
@@ -80,7 +80,7 @@ public:
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto flat_map(op_type transform) const
     {
         auto container = flat_map_container{ m_begin, m_end, transform };
@@ -88,10 +88,10 @@ public:
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr void for_each(op_type op) const
     {
-        for (const auto& value : *this)
+        for (decltype(auto) value : *this)
             std::invoke(op, value);
     }
 
@@ -102,7 +102,7 @@ public:
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto map(op_type transform) const
     {
         auto container = map_container{ m_begin, m_end, transform };
@@ -110,14 +110,14 @@ public:
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto none_match(op_type predicate) const
     {
         return !this->any_match(predicate);
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
+    template <typename op_type>
     constexpr auto peek(op_type peeker) const
     {
         auto container = peek_container{ m_begin, m_end, peeker };
@@ -125,7 +125,7 @@ public:
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename T, typename op_type> requires std::invocable<op_type, T, value_type>
+    template <typename T, typename op_type>
     constexpr T reduce(const T& identity, op_type transform) const
     {
         T result = identity;
@@ -150,13 +150,13 @@ public:
     }
 };
 
-export constexpr auto generate_stream(std::invocable auto op)
+export constexpr auto generate_stream(auto op)
 {
     return stream{ generate_container{ op } };
 }
 
 export template <typename T>
-constexpr auto iterate_stream(const T& seed, std::invocable<T> auto op)
+constexpr auto iterate_stream(const T& seed, auto op)
 {
     struct _local
     {

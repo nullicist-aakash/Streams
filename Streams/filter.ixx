@@ -2,13 +2,12 @@ export module stream:filter;
 import :common;
 
 template <typename begin_type, typename end_type, typename predicate_type> 
-    requires valid_iterator<begin_type, end_type>
+    requires is_valid_iterator<begin_type, end_type>
 class filter_iterator
 {
     begin_type m_iterator;
     end_type m_end;
     predicate_type predicate;
-    static_assert(std::invocable<predicate_type, decltype(*m_iterator)>, "Predicate is not invocable with the value type of the container!");
     static_assert(std::same_as<std::remove_cvref_t<decltype(std::invoke(predicate, *m_iterator))>, bool>, "Predicate does not return a boolean value!");
 
 public:
@@ -32,13 +31,12 @@ public:
 };
 
 template <typename begin_type, typename end_type, typename predicate_type> 
-    requires valid_iterator<begin_type, end_type>
+    requires is_valid_iterator<begin_type, end_type>
 struct filter_container
 {
     const begin_type m_begin;
     const end_type m_end;
     const predicate_type predicate;
-    static_assert(std::invocable<predicate_type, decltype(*m_begin)>, "Predicate is not invocable with the value type of the container!");
     static_assert(std::same_as<std::remove_cvref_t<decltype(std::invoke(predicate, *m_begin))>, bool>, "Predicate does not return a boolean value!");
 
     constexpr auto begin() const { return filter_iterator(m_begin, m_end, predicate); }
