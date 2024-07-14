@@ -33,7 +33,7 @@
     <ClCompile Include="limit.ixx">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="iterate.ixx">
+    <ClCompile Include="generate.ixx">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

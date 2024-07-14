@@ -5,8 +5,6 @@ using namespace std;
 
 int main()
 {
-	int sum = 0;
-	for (auto x : int_stream(1, 3).limit(5))
-		sum += x;
-	return sum;
+	for (const auto x : int_stream(1, 1).filter([](int x) {return x > 6;}).limit(5ul))
+		cout << x << endl;
 }

@@ -7,11 +7,11 @@ template <typename begin_type, typename end_type>
 class limit_iterator
 {
     begin_type m_iterator;
-    const end_type m_end;
+    const end_type& m_end;
     int remain;
 
 public:
-    constexpr limit_iterator(begin_type iterator, end_type end, int limit) : m_iterator{ iterator }, m_end{ end }, remain{ std::max(0, limit) } { }
+    constexpr limit_iterator(const begin_type& iterator, const end_type& end, const int& limit) : m_iterator{ iterator }, m_end{ end }, remain{ std::max(0, limit) } { }
 
     constexpr auto operator*() const { return *m_iterator; }
 

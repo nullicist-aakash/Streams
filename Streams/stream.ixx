@@ -2,7 +2,7 @@ export module stream;
 import :filter;
 import :map;
 import :limit;
-import :iterate;
+import :generate;
 import std;
 
 export template <typename Container> requires requires(Container cont) { cont.begin(); cont.end(); }
@@ -19,8 +19,10 @@ class stream
     template <typename OtherContainer> requires requires(OtherContainer cont) { cont.begin(); cont.end(); }
     friend class stream;
 
-    template <typename T, typename op_type>
-    friend constexpr auto seed_stream(T&& seed, op_type&& op);
+    friend constexpr auto generate_stream(std::invocable auto op);
+
+    template <typename T>
+    friend constexpr auto seed_stream(const T& seed, std::invocable<T> auto op);
 
     constexpr stream(Container&& container) : mm_container{ std::move(container) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
 public:
@@ -28,15 +30,13 @@ public:
     constexpr auto begin() const { return m_begin; }
     constexpr auto end() const { return m_end; }
 
-    template <typename T> requires std::invocable<T, value_type>
-    constexpr auto filter(const T&& predicate) const
+    constexpr auto filter(std::invocable<value_type> auto predicate) const
     {
         auto container = filter_container{ m_begin, m_end, predicate };
         return stream<decltype(container)>{ std::move(container) };
     }
 
-    template <typename T> requires std::invocable<T, value_type>
-    constexpr auto map(T&& transform) const
+    constexpr auto map(std::invocable<value_type> auto transform) const
     {
         auto container = map_container{ m_begin, m_end, transform };
         return stream<decltype(container)>{ std::move(container) };
@@ -49,15 +49,34 @@ public:
 	}
 };
 
-
-template <typename T, typename op_type>
-constexpr auto seed_stream(T&& seed, op_type&& op)
+export constexpr auto generate_stream(std::invocable auto op)
 {
-    return stream { iterate_container{ std::forward<T>(seed), std::forward<op_type>(op) } };
+    return stream{ generate_container{ op } };
 }
 
-export template <std::integral start_type, std::integral step_type>
-constexpr auto int_stream(start_type&& start, step_type&& steps = 1)
+export template <typename T>
+constexpr auto seed_stream(const T& seed, std::invocable<T> auto op)
 {
-    return seed_stream(std::forward<start_type>(start), [steps](auto x) { return x + steps; });
+    struct _local
+    {
+        mutable std::shared_ptr<T> _seed;
+        decltype(op) _op;
+        mutable bool init = false;
+
+        constexpr T operator()() const {
+            if (!init) {
+                init = true;
+                return *_seed;
+            }
+
+            return *(_seed = std::make_shared<T>(std::invoke(_op, *_seed)));
+        }
+    };
+
+    return stream{ generate_container{ _local{ std::make_shared<T>(seed), op } } };
+}
+
+export constexpr auto int_stream(const std::integral auto& start, const std::integral auto& steps)
+{
+    return seed_stream(start, [steps](const auto& x) { return x + steps; });
 }
