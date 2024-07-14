@@ -8,12 +8,13 @@ template <typename begin_type, typename end_type, typename transform_type>
 class flat_map_iterator
 {
     using mapped_type = std::invoke_result_t<transform_type, decltype(*std::declval<begin_type>())>;
+    using mapped_itr_type = decltype(std::declval<mapped_type>().begin());
 
     begin_type m_iterator;
     end_type m_end;
     transform_type transform;
     std::shared_ptr<mapped_type> container{ nullptr };
-    std::optional<decltype(container->begin())> container_iterator{ std::nullopt };
+    std::shared_ptr<mapped_itr_type> container_iterator{ nullptr };
     
     static_assert(is_container<mapped_type>, "Result type is not a iterable thing!");
 public:
@@ -28,7 +29,7 @@ public:
 				++m_iterator;
 				continue;
 			}
-            container_iterator = container->begin();
+            container_iterator = std::make_shared<mapped_itr_type>(container->begin());
             break;
         }
     }
@@ -49,7 +50,7 @@ public:
 			container = std::make_shared<mapped_type>(std::invoke(transform, *m_iterator));
 			if (container->begin() == container->end())
 				continue;
-			container_iterator = container->begin();
+            container_iterator = std::make_shared<mapped_itr_type>(container->begin());
 			break;
 		}
         return *this;

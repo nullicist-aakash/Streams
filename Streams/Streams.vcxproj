@@ -225,6 +225,7 @@
     <ClCompile Include="generate.ixx" />
     <ClCompile Include="limit.ixx" />
     <ClCompile Include="map.ixx" />
+    <ClCompile Include="peek.ixx" />
     <ClCompile Include="stream.ixx" />
     <ClCompile Include="Streams.cpp" />
   </ItemGroup>

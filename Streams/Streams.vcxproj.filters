@@ -42,5 +42,8 @@
     <ClCompile Include="flat_map.ixx">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="peek.ixx">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

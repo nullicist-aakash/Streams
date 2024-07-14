@@ -5,6 +5,7 @@ import :flat_map;
 import :map;
 import :limit;
 import :generate;
+import :peek;
 import std;
 
 export template <is_container Container>
@@ -117,11 +118,10 @@ public:
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
     template <typename op_type> requires std::invocable<op_type, value_type>
-    constexpr auto peek(op_type op) const
+    constexpr auto peek(op_type peeker) const
     {
-        if (this->begin() != this->end())
-            std::invoke(op, *this->begin());
-        return *this;
+        auto container = peek_container{ m_begin, m_end, peeker };
+        return stream<decltype(container)>{ std::move(container) };
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
