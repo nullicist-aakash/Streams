@@ -25,6 +25,26 @@ public:
     constexpr auto begin() const { return m_begin; }
     constexpr auto end() const { return m_end; }
 
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto all_match(op_type predicate) const
+	{
+        for (const auto& entry: *this)
+            if (!std::invoke(predicate, entry))
+				return false;
+        return true;
+	}
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto any_match(op_type predicate) const
+    {
+        for (const auto& entry: *this)
+			if (std::invoke(predicate, entry))
+                return true;
+		return false;
+    }
+
     constexpr auto distinct() const
 	{
 		auto container = distinct_container{ m_begin, m_end };
@@ -37,6 +57,17 @@ public:
     {
         auto container = filter_container{ m_begin, m_end, predicate };
         return stream<decltype(container)>{ std::move(container) };
+    }
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto find_any(op_type predicate) const
+    {
+        std::optional<std::remove_cvref_t<decltype(*this->begin())>> op{ std::nullopt };
+        for (const auto& entry: *this)
+			if (std::invoke(predicate, entry))
+				return std::optional{ entry };
+		return op;
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
