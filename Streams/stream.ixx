@@ -1,8 +1,9 @@
 export module stream;
-import :range;
 import :filter;
 import :map;
 import :limit;
+import :iterate;
+import std;
 
 export template <typename Container> requires requires(Container cont) { cont.begin(); cont.end(); }
 class stream
@@ -18,9 +19,9 @@ class stream
     template <typename OtherContainer> requires requires(OtherContainer cont) { cont.begin(); cont.end(); }
     friend class stream;
 
-    template <std::integral basic_type>
-    friend stream<range<basic_type>> int_stream(basic_type start, basic_type end, std::uint64_t steps);
-    
+    template <typename T, typename op_type>
+    friend constexpr auto seed_stream(T&& seed, op_type&& op);
+
     constexpr stream(Container&& container) : mm_container{ std::move(container) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
 public:
     constexpr stream(Container& container) : mm_container{ std::nullopt }, m_begin{ container.begin() }, m_end{ container.end() } {}
@@ -48,5 +49,15 @@ public:
 	}
 };
 
-export template <std::integral basic_type>
-stream<range<basic_type>> int_stream(basic_type start, basic_type end, std::uint64_t steps = 1) { return stream{ range<basic_type>{start, end, steps} }; }
+
+template <typename T, typename op_type>
+constexpr auto seed_stream(T&& seed, op_type&& op)
+{
+    return stream { iterate_container{ std::forward<T>(seed), std::forward<op_type>(op) } };
+}
+
+export template <std::integral start_type, std::integral step_type>
+constexpr auto int_stream(start_type&& start, step_type&& steps = 1)
+{
+    return seed_stream(std::forward<start_type>(start), [steps](auto x) { return x + steps; });
+}

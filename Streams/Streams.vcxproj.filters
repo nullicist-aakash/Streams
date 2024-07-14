@@ -27,13 +27,13 @@
     <ClCompile Include="common.ixx">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="range.ixx">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
     <ClCompile Include="map.ixx">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="limit.ixx">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="iterate.ixx">
       <Filter>Resource Files</Filter>
     </ClCompile>
   </ItemGroup>

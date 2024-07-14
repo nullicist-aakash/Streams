@@ -23,8 +23,8 @@ public:
     }
     constexpr auto operator++(int) { auto tmp = *this; ++(*this); return tmp; }
 
-    static friend constexpr auto operator== (const limit_iterator& a, sentinel end) { return a.remain == 0 || a.m_iterator == a.m_end; };
-    static friend constexpr auto operator!= (const limit_iterator& a, sentinel end) { return !(a == end); };
+    friend constexpr auto operator== (const limit_iterator& a, sentinel end) { return a.remain == 0 || a.m_iterator == a.m_end; };
+    friend constexpr auto operator!= (const limit_iterator& a, sentinel end) { return !(a == end); };
 };
 
 template <typename begin_type, typename end_type>
