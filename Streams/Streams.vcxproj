@@ -219,6 +219,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="common.ixx" />
+    <ClCompile Include="distinct.ixx" />
     <ClCompile Include="filter.ixx" />
     <ClCompile Include="generate.ixx" />
     <ClCompile Include="limit.ixx" />

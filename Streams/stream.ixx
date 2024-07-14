@@ -1,4 +1,5 @@
 export module stream;
+import :distinct;
 import :filter;
 import :map;
 import :limit;
@@ -23,6 +24,12 @@ public:
     constexpr stream(Container& container) : mm_container{ std::nullopt }, m_begin{ container.begin() }, m_end{ container.end() } {}
     constexpr auto begin() const { return m_begin; }
     constexpr auto end() const { return m_end; }
+
+    constexpr auto distinct() const
+	{
+		auto container = distinct_container{ m_begin, m_end };
+		return stream<decltype(container)>{ std::move(container) };
+	}
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
     template <typename op_type> requires std::invocable<op_type, value_type>
