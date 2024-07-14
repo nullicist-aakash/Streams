@@ -59,15 +59,23 @@ public:
         return stream<decltype(container)>{ std::move(container) };
     }
 
-    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
-    template <typename op_type> requires std::invocable<op_type, value_type>
-    constexpr auto find_any(op_type predicate) const
+    constexpr auto find_any() const
     {
         std::optional<std::remove_cvref_t<decltype(*this->begin())>> op{ std::nullopt };
-        for (const auto& entry: *this)
-			if (std::invoke(predicate, entry))
-				return std::optional{ entry };
-		return op;
+        if (m_begin != m_end)
+            op = *m_begin;
+        return op;
+    }
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto find_first(op_type predicate) const
+    {
+        std::optional<std::remove_cvref_t<decltype(*this->begin())>> op{ std::nullopt };
+        for (const auto& entry : *this)
+            if (std::invoke(predicate, entry))
+                return std::optional{ entry };
+        return op;
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
@@ -94,11 +102,28 @@ public:
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
     template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto none_match(op_type predicate) const
+    {
+        return !this->any_match(predicate);
+    }
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
     constexpr auto peek(op_type op) const
     {
         if (this->begin() != this->end())
             std::invoke(op, *this->begin());
         return *this;
+    }
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename T, typename op_type> requires std::invocable<op_type, T, value_type>
+    constexpr T reduce(const T& identity, op_type transform) const
+    {
+        T result = identity;
+        for (const auto& entry : *this)
+			result = std::invoke(transform, result, entry);
+        return result;
     }
 
     constexpr auto skip(int skip) const
