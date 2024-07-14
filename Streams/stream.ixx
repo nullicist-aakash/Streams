@@ -18,34 +18,48 @@ class stream
 
     template <typename OtherContainer> requires requires(OtherContainer cont) { cont.begin(); cont.end(); }
     friend class stream;
-
-    friend constexpr auto generate_stream(std::invocable auto op);
-
-    template <typename T>
-    friend constexpr auto seed_stream(const T& seed, std::invocable<T> auto op);
-
-    constexpr stream(Container&& container) : mm_container{ std::move(container) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
 public:
+    constexpr stream(Container&& container) : mm_container{ std::move(container) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
     constexpr stream(Container& container) : mm_container{ std::nullopt }, m_begin{ container.begin() }, m_end{ container.end() } {}
     constexpr auto begin() const { return m_begin; }
     constexpr auto end() const { return m_end; }
 
-    constexpr auto filter(std::invocable<value_type> auto predicate) const
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto filter(op_type predicate) const
     {
         auto container = filter_container{ m_begin, m_end, predicate };
         return stream<decltype(container)>{ std::move(container) };
     }
 
-    constexpr auto map(std::invocable<value_type> auto transform) const
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto map(op_type transform) const
     {
         auto container = map_container{ m_begin, m_end, transform };
         return stream<decltype(container)>{ std::move(container) };
+    }
+
+    constexpr auto skip(int skip) const
+    {
+        auto that = *this;
+        while (that.m_begin != that.m_end && skip-- > 0)
+			++that.m_begin;
+        return that;
     }
 
     constexpr auto limit(int limit) const
 	{
 		auto container = limit_container{ m_begin, m_end, limit };
 		return stream<decltype(container)>{ std::move(container) };
+	}
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr void for_each(op_type op) const
+	{
+		for (const auto& value : *this)
+			std::invoke(op, value);
 	}
 };
 
@@ -55,7 +69,7 @@ export constexpr auto generate_stream(std::invocable auto op)
 }
 
 export template <typename T>
-constexpr auto seed_stream(const T& seed, std::invocable<T> auto op)
+constexpr auto iterate_stream(const T& seed, std::invocable<T> auto op)
 {
     struct _local
     {
@@ -78,5 +92,5 @@ constexpr auto seed_stream(const T& seed, std::invocable<T> auto op)
 
 export constexpr auto int_stream(const std::integral auto& start, const std::integral auto& steps)
 {
-    return seed_stream(start, [steps](const auto& x) { return x + steps; });
+    return iterate_stream(start, [steps](const auto& x) { return x + steps; });
 }
