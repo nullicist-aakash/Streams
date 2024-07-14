@@ -221,6 +221,7 @@
     <ClCompile Include="common.ixx" />
     <ClCompile Include="distinct.ixx" />
     <ClCompile Include="filter.ixx" />
+    <ClCompile Include="flat_map.ixx" />
     <ClCompile Include="generate.ixx" />
     <ClCompile Include="limit.ixx" />
     <ClCompile Include="map.ixx" />

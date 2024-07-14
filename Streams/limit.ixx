@@ -7,7 +7,7 @@ template <typename begin_type, typename end_type>
 class limit_iterator
 {
     begin_type m_iterator;
-    const end_type& m_end;
+    end_type m_end;
     int remain;
 
 public:
@@ -17,14 +17,13 @@ public:
 
     constexpr auto& operator++()
     {
-        if (remain-- > 0)
-            ++m_iterator;
+        if (remain-- > 0 && ++m_iterator != m_end);
         return *this;
     }
     constexpr auto operator++(int) { auto tmp = *this; ++(*this); return tmp; }
 
-    friend constexpr auto operator== (const limit_iterator& a, sentinel end) { return a.remain == 0 || a.m_iterator == a.m_end; };
-    friend constexpr auto operator!= (const limit_iterator& a, sentinel end) { return !(a == end); };
+    friend constexpr auto operator== (const limit_iterator& a, end_type end) { return a.remain == 0 || a.m_iterator == end; };
+    friend constexpr auto operator!= (const limit_iterator& a, end_type end) { return !(a == end); };
 };
 
 template <typename begin_type, typename end_type>
@@ -36,5 +35,5 @@ struct limit_container
     const int limit;
 
     constexpr auto begin() const { return limit_iterator(m_begin, m_end, limit); }
-    constexpr auto end() const { return sentinel{}; }
+    constexpr auto end() const { return m_end; }
 };

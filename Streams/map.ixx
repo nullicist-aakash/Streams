@@ -8,8 +8,8 @@ class map_iterator
     using mapped_type = std::invoke_result_t<transform_type, decltype(*std::declval<begin_type>())>;
     
     begin_type m_iterator;
-    const end_type& m_end;
-    const transform_type& transform;
+    end_type m_end;
+    transform_type transform;
 
 public:
     constexpr map_iterator(begin_type iterator, const end_type& end, const transform_type& transform) : m_iterator{ iterator }, m_end{ end }, transform{ transform } { }

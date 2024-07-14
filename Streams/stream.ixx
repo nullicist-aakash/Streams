@@ -1,6 +1,7 @@
 export module stream;
 import :distinct;
 import :filter;
+import :flat_map;
 import :map;
 import :limit;
 import :generate;
@@ -13,14 +14,14 @@ class stream
     using begin_type = decltype(std::declval<Container>().begin());
     using end_type = decltype(std::declval<Container>().end());
 
-    std::optional<Container> mm_container;
+    std::shared_ptr<Container> mm_container;
     begin_type m_begin;
-    end_type m_end; 
+    end_type m_end;
 
     template <is_container OtherContainer> friend class stream;
 public:
-    constexpr stream(Container&& container) : mm_container{ std::move(container) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
-    constexpr stream(Container& container) : mm_container{ std::nullopt }, m_begin{ container.begin() }, m_end{ container.end() } {}
+    constexpr stream(Container&& container) : mm_container{ std::make_shared<Container>(std::move(container)) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
+    constexpr stream(Container& container) : mm_container{ nullptr }, m_begin{ container.begin() }, m_end{ container.end() } {}
     constexpr auto begin() const { return m_begin; }
     constexpr auto end() const { return m_end; }
 
@@ -47,7 +48,7 @@ public:
     constexpr auto distinct() const
 	{
 		auto container = distinct_container{ m_begin, m_end };
-		return stream<decltype(container)>{ std::move(container) };
+		return stream<decltype(container)>(std::move(container));
 	}
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
@@ -75,6 +76,14 @@ public:
             if (std::invoke(predicate, entry))
                 return std::optional{ entry };
         return op;
+    }
+
+    // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
+    template <typename op_type> requires std::invocable<op_type, value_type>
+    constexpr auto flat_map(op_type transform) const
+    {
+        auto container = flat_map_container{ m_begin, m_end, transform };
+        return stream<decltype(container)>{ std::move(container) };
     }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
@@ -137,7 +146,7 @@ public:
     {
         std::vector<value_type> container{ m_begin, m_end };
         std::sort(container.begin(), container.end());
-        return stream<decltype(container)>{ std::move(container) };
+        return container;
     }
 };
 

@@ -6,7 +6,7 @@ template <typename begin_type, typename end_type> requires valid_iterator<begin_
 class distinct_iterator
 {
     begin_type m_iterator;
-    const end_type& m_end;
+    end_type m_end;
     std::set<std::remove_cvref_t<decltype(*m_iterator)>> m_set;
 
 public:
@@ -25,8 +25,8 @@ public:
     }
     constexpr auto operator++(int) { auto tmp = *this; ++(*this); return tmp; }
 
-    static friend constexpr auto operator== (const distinct_iterator& a, sentinel end) { return a.m_iterator == a.m_end; };
-    static friend constexpr auto operator!= (const distinct_iterator& a, sentinel end) { return a.m_iterator != a.m_end; };
+    static friend constexpr auto operator== (const distinct_iterator& a, const end_type& end) { return a.m_iterator == end; };
+    static friend constexpr auto operator!= (const distinct_iterator& a, const end_type& end) { return a.m_iterator != end; };
 };
 
 template <typename begin_type, typename end_type> requires valid_iterator<begin_type, end_type>
@@ -36,5 +36,5 @@ struct distinct_container
     const end_type m_end;
 
     constexpr auto begin() const { return distinct_iterator(m_begin, m_end); }
-    constexpr auto end() const { return sentinel{}; }
+    constexpr auto end() const { return m_end; }
 };
