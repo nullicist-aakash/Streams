@@ -10,26 +10,54 @@ class flat_map_iterator
     using mapped_type = std::invoke_result_t<transform_type, decltype(*std::declval<begin_type>())>;
 
     begin_type m_iterator;
-    const end_type& m_end;
-    const transform_type& transform;
+    end_type m_end;
+    transform_type transform;
+    std::shared_ptr<mapped_type> container{ nullptr };
+    std::optional<decltype(container->begin())> container_iterator{ std::nullopt };
     
-    static_assert(is_container<std::remove_cvref_t<decltype(std::invoke(transform, *m_iterator))>>, "Result type is not a iterable thing!");
+    static_assert(is_container<mapped_type>, "Result type is not a iterable thing!");
 public:
-    constexpr flat_map_iterator(begin_type iterator, const end_type& end, const transform_type& transform) : m_iterator{ iterator }, m_end{ end }, transform{ transform } {
-        
+    constexpr flat_map_iterator(begin_type iterator, const end_type& end, const transform_type& transform) : m_iterator{ iterator }, m_end{ end }, transform{ transform } 
+    {
+        while (m_iterator != m_end)
+        {
+            container = std::make_shared<mapped_type>(std::invoke(transform, *m_iterator));
+            if (container->begin() == container->end())
+			{
+                container = nullptr;
+				++m_iterator;
+				continue;
+			}
+            container_iterator = container->begin();
+            break;
+        }
     }
 
-    constexpr auto operator*() const { return std::invoke(transform, *m_iterator); }
+    constexpr auto operator*() const { return *(*container_iterator); }
 
     constexpr auto& operator++()
     {
-        ++m_iterator;
+        if (*container_iterator != container->end())
+        {
+            ++(*container_iterator);
+            if (*container_iterator != container->end())
+				return *this;
+        }
+
+        while (++m_iterator != m_end)
+		{
+			container = std::make_shared<mapped_type>(std::invoke(transform, *m_iterator));
+			if (container->begin() == container->end())
+				continue;
+			container_iterator = container->begin();
+			break;
+		}
         return *this;
     }
     constexpr auto operator++(int) { auto tmp = *this; ++(*this); return tmp; }
 
-    static friend constexpr auto operator== (const flat_map_iterator& a, sentinel end) { return a.m_iterator == a.m_end; };
-    static friend constexpr auto operator!= (const flat_map_iterator& a, sentinel end) { return a.m_iterator != a.m_end; };
+    static friend constexpr auto operator== (const flat_map_iterator& a, const end_type& end) { return a.m_iterator == end; };
+    static friend constexpr auto operator!= (const flat_map_iterator& a, const end_type& end) { return a.m_iterator != end; };
 };
 
 template <typename begin_type, typename end_type, typename transform_type>
@@ -37,12 +65,14 @@ template <typename begin_type, typename end_type, typename transform_type>
     && std::invocable<transform_type, decltype(*std::declval<begin_type>())>
 struct flat_map_container
 {
+    using mapped_type = std::invoke_result_t<transform_type, decltype(*std::declval<begin_type>())>;
+
     const begin_type m_begin;
     const end_type m_end;
     const transform_type transform;
 
-    static_assert(is_container<std::remove_cvref_t<decltype(std::invoke(transform, *m_begin))>>, "Result type is not a iterable thing!");
+    static_assert(is_container<mapped_type>, "Result type is not a iterable thing!");
 
     constexpr auto begin() const { return flat_map_iterator(m_begin, m_end, transform); }
-    constexpr auto end() const { return sentinel{}; }
+    constexpr auto end() const { return m_end; }
 };

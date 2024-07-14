@@ -22,8 +22,8 @@ class stream
 public:
     constexpr stream(Container&& container) : mm_container{ std::make_shared<Container>(std::move(container)) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
     constexpr stream(Container& container) : mm_container{ nullptr }, m_begin{ container.begin() }, m_end{ container.end() } {}
-    constexpr auto begin() const { return m_begin; }
-    constexpr auto end() const { return m_end; }
+    constexpr auto& begin() const { return m_begin; }
+    constexpr auto& end() const { return m_end; }
 
     // Using long method name to keep intellisense happy. Otherwise, we can inline this concept in function declaration
     template <typename op_type> requires std::invocable<op_type, value_type>

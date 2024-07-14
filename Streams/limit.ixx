@@ -17,7 +17,8 @@ public:
 
     constexpr auto& operator++()
     {
-        if (remain-- > 0 && ++m_iterator != m_end);
+        if (m_iterator != m_end && remain-- > 0)
+            ++m_iterator;
         return *this;
     }
     constexpr auto operator++(int) { auto tmp = *this; ++(*this); return tmp; }

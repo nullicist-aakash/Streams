@@ -7,10 +7,10 @@ class distinct_iterator
 {
     begin_type m_iterator;
     end_type m_end;
-    std::set<std::remove_cvref_t<decltype(*m_iterator)>> m_set;
+    std::shared_ptr<std::set<std::remove_cvref_t<decltype(*m_iterator)>>> m_set;
 
 public:
-    constexpr distinct_iterator(const begin_type& iterator, const end_type& end) : m_iterator{ iterator }, m_end{ end }
+    constexpr distinct_iterator(const begin_type& iterator, const end_type& end) : m_iterator{ iterator }, m_end{ end }, m_set{ std::make_shared<std::set<std::remove_cvref_t<decltype(*m_iterator)>>>() }
     {
 
     }
@@ -19,8 +19,8 @@ public:
 
     constexpr auto& operator++()
     {
-        m_set.insert(*m_iterator);
-        while (++m_iterator != m_end && m_set.contains(*m_iterator));
+        m_set->insert(*m_iterator);
+        while (++m_iterator != m_end && m_set->contains(*m_iterator));
         return *this;
     }
     constexpr auto operator++(int) { auto tmp = *this; ++(*this); return tmp; }
