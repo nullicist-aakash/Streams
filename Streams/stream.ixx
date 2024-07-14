@@ -6,7 +6,7 @@ import :limit;
 import :generate;
 import std;
 
-export template <typename Container> requires requires(Container cont) { cont.begin(); cont.end(); }
+export template <is_container Container>
 class stream
 {
     using value_type = std::remove_cvref_t<decltype(*std::declval<Container>().begin())>;
@@ -17,8 +17,7 @@ class stream
     begin_type m_begin;
     end_type m_end; 
 
-    template <typename OtherContainer> requires requires(OtherContainer cont) { cont.begin(); cont.end(); }
-    friend class stream;
+    template <is_container OtherContainer> friend class stream;
 public:
     constexpr stream(Container&& container) : mm_container{ std::move(container) }, m_begin{ mm_container->begin() }, m_end{ mm_container->end() } {}
     constexpr stream(Container& container) : mm_container{ std::nullopt }, m_begin{ container.begin() }, m_end{ container.end() } {}
