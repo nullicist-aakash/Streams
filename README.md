@@ -6,5 +6,5 @@ I hoped that after implementing a basic `stream` API in C++, I get to appreciate
 I learned a lot in this project, and the main problem that I tackled is: **Ownership problem of temporary containers**.
 
 I solved this using this technique (maybe this is not a good technique? IDK): 
-- If the input is r-value, store that container in `stream` API, and use first/last pointers to point to this "internal" container.
+- If the input is r-value, store that container in `stream` object, and use first/last pointers to point to this "internal" container.
 - If the input is l-value, simply use first/last pointers to point to "non temporary" container.
